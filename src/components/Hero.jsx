@@ -41,18 +41,36 @@ const Hero = () => {
     }
   }
 
-  const startSpeechRecognition = () => {
+  const voiceRecognisation = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     setContent("Listening...");
     const recognition = new SpeechRecognition();
-    recognition.start();
+    recognition.onstart = function(){
+      console.log("start");
+    }
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[event.resultIndex][0].transcript;
-      setContent(transcript);
-      speakThis(transcript.toLowerCase());
-    };
+    recognition.onend = function(){
+      console.log("end");
+    }
+  }
+
+  const startSpeechRecognition = () => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      setContent("Listening...");
+      const recognition = new SpeechRecognition();
+      recognition.start();
+  
+      recognition.onresult = (event) => {
+        const transcript = event.results[event.resultIndex][0].transcript;
+        setContent(transcript);
+        speakThis(transcript.toLowerCase());
+      };
+    } else {
+      console.log("Speech Recognition API not supported");
+    }
   };
-
+  
   const speakThis = (message) => {
     const speech = new SpeechSynthesisUtterance();
     speech.text = "I didn't understand what you said. Please speak again.";
@@ -94,16 +112,17 @@ const Hero = () => {
       </div>
       <h1 className="text-[#54BBFE] text-[40px] font-bold mt-[-20px]">I N E R T I A</h1>
       {isActivated ? (
-        <button onClick={startSpeechRecognition} className="bg-gray-500 flex justify-center items-center w-[320px] md:w-[500px] px-5 text-white py-2 rounded-full font-normal text-[16px] mt-7">
-          <FaMicrophone />
-          <span className="ml-2">{content}</span>
-        </button>
-      ) : (
-        <button onClick={activate} className="bg-gray-500 flex justify-center items-center w-[320px] md:w-[500px] px-5 text-white py-2 rounded-full font-normal text-[16px] mt-7">
-          <FaMicrophone />
-          <span className="ml-2">Activate</span>
-        </button>
-      )}
+  <button onClick={startSpeechRecognition} className="bg-gray-500 flex justify-center items-center w-[320px] md:w-[500px] px-5 text-white py-2 rounded-full font-normal text-[16px] mt-7">
+    <FaMicrophone />
+    <span className="ml-2">{content}</span>
+  </button>
+) : (
+  <button onClick={activate} className="bg-gray-500 flex justify-center items-center w-[320px] md:w-[500px] px-5 text-white py-2 rounded-full font-normal text-[16px] mt-7">
+    <FaMicrophone />
+    <span className="ml-2">Activate</span>
+  </button>
+)}
+
     </div>
   );
 };
